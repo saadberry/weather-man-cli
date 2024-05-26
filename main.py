@@ -2,6 +2,7 @@
 Main file to handle weather data
 """
 import os
+import re
 """
 
 We can define data structure as: 
@@ -52,6 +53,28 @@ class Weather():
     def __init__(self):
         self.weather_data = {}
 
+    @staticmethod
+    def convert_temp_reading_to_list(temp_reading):
+        """
+        Method that uses converts temperature reading to a list
+
+        Readings are stored as:
+            2009-12-1,17,13,9,8,5,3,55,52,51,,,,10.0,7.0,4.0,7,2,,0.0,,,-1
+        Where:
+            - The first element is the date  - 2009-12-1 (YYYY-MM-DD)
+            - The second element is the max temp - 17
+            - The third element is the mean temp - 13
+            - The fourth element is the min temp - 9
+
+        Args:
+            temp_reading (str): temperature reading
+
+        Returns:
+            temp_list (list): temperature readings split by commas
+        """
+        temp_list = temp_reading.split(',')
+        return temp_list
+
     def read_data(self):
         """
         Method to read weather data
@@ -94,8 +117,15 @@ class Weather():
                         # print('day after operation', day)
                     if day not in self.weather_data[year][month]:
                         self.weather_data[year][month][day] = []
+                    if not self.weather_data[year][month][day]:
+                        temp_list = self.convert_temp_reading_to_list(d)
+                        # Add max temp
+                        self.weather_data[year][month][day].append(temp_list[1])
+                        # Add mean temp
+                        self.weather_data[year][month][day].append(temp_list[2])
+                        # Add min temp
+                        self.weather_data[year][month][day].append(temp_list[3])
 
-                # print(x[2])
         print(self.weather_data)
 
 if __name__ == '__main__':
