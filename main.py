@@ -2,7 +2,7 @@
 Main file to handle weather data
 """
 import os
-import re
+
 """
 
 We can define data structure as: 
@@ -45,7 +45,7 @@ e.g.
 """
 
 
-class Weather():
+class ReadWeather():
     """
     Class to parse the files & populating the readings data structure
     """
@@ -83,7 +83,7 @@ class Weather():
         """
         files_directory = "/home/winston/documents/code/training-plan/weather-man-cli/weatherfiles/"
         files = os.listdir(files_directory)
-        print(self.weather_data)
+        # print(self.weather_data)
         for f in files:
             with open(f"{files_directory}/{f}", 'r') as reader:
                 x = reader.readlines()
@@ -119,15 +119,62 @@ class Weather():
                         self.weather_data[year][month][day] = []
                     if not self.weather_data[year][month][day]:
                         temp_list = self.convert_temp_reading_to_list(d)
+                        # print(temp_list)
                         # Add max temp
                         self.weather_data[year][month][day].append(temp_list[1])
-                        # Add mean temp
-                        self.weather_data[year][month][day].append(temp_list[2])
                         # Add min temp
                         self.weather_data[year][month][day].append(temp_list[3])
+                        # Add max humidity
+                        self.weather_data[year][month][day].append(temp_list[8])
 
-        print(self.weather_data)
+        # print(self.weather_data)
+
+
+class CalculateTemp(ReadWeather):
+    """
+    Class that calculates the highest, lowest temperature and max humidity
+    """
+
+    def __init__(self, weather_instance):
+        # weather readings will be stored as [max_temp, min_temp, max_humidity]
+        self.weather_readings = weather_instance.weather_data
+        self.exception_msg = "Please enter a valid integer value from 2004 - 2016"
+        # print(self.weather_readings)
+
+    def validate_data(self, year):
+        """
+        Method that validates that:
+           - The value entered is of type int
+           - It corresponds to the range of weather values ( 2004 - 2016 )
+
+        Raises an Exception with a message if validation fails, does nothing if validation is successful
+        """
+        # Convert str-value of year to int
+        try:
+            year = int(year)
+        except:
+            raise Exception(self.exception_msg)
+        assert 2004 <= year <= 2016, self.exception_msg
+
+    def task_one(self):
+        """
+        Flow will be:
+        - Input an year from user - for now we can use hard-coded values.
+        - Iterate through the weather readings data structure
+        - First max, min temp & humidity values will be stored in self.weather_readings
+        - Then, for subsequent iterations we will be doing a comparison. And update values accordingly
+
+        Add error handling to make sure:
+          - The value entered is of type int
+          - It corresponds to the range of weather values ( 2004 - 2016 )
+        """
+        year = input("Enter year: ")
+        print(year)
+        self.validate_data(year)
+
 
 if __name__ == '__main__':
-    weather = Weather()
+    weather = ReadWeather()
     weather.read_data()
+    calc_temp = CalculateTemp(weather)
+    calc_temp.task_one()
