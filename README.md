@@ -1,5 +1,5 @@
 # Weather Man 
-A CLI based program that returns the weather of Muree, Pakistan on a said day.
+A CLI based program that returns the weather of a said day.
 
 ### The Problem
 
