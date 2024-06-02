@@ -2,7 +2,7 @@
 Main file to handle weather data
 """
 import os
-
+import calendar
 """
 
 We can define data structure as: 
@@ -140,6 +140,14 @@ class CalculateTemp(ReadWeather):
         self.weather_readings = weather_instance.weather_data
         self.exception_msg = "Please enter a valid integer value from 2004 - 2016"
         # print(self.weather_readings)
+        self.max_temp, self.max_humidity, self.min_temp = 0, 0, 100
+        # Data structure to hold data
+        self.result = {
+            'Highest': [], # temperature, month, day
+            'Lowest': [],
+            'Humidity': []
+        }
+        self.months = list(calendar.month_name)
 
     def validate_data(self, year):
         """
@@ -163,14 +171,68 @@ class CalculateTemp(ReadWeather):
         - Iterate through the weather readings data structure
         - First max, min temp & humidity values will be stored in self.weather_readings
         - Then, for subsequent iterations we will be doing a comparison. And update values accordingly
-
-        Add error handling to make sure:
-          - The value entered is of type int
-          - It corresponds to the range of weather values ( 2004 - 2016 )
         """
-        year = input("Enter year: ")
-        print(year)
+        # year = input("Enter year: ")
+        year = str(2005)
         self.validate_data(year)
+        # print(f"Year entered: {year}")
+        year_data = self.weather_readings.get(year)
+        # print(f"Year data: {year_data}")
+        for key, value in year_data.items():
+            month = int(key)
+            # print(f"{key}: {value}")
+            for k, v in value.items():
+                day = int(k)
+                # print(f"{k}: {v}")
+                # Find max temp
+                # If max_temp value exists
+                if v[0]:
+                    # print(f"in v[0]: {v[0]}")
+                    if self.max_temp < int(v[0]):
+                        # print("in if")
+                        self.max_temp = int(v[0])
+                        if self.result['Highest']:
+                            self.result['Highest'][0] = self.max_temp
+                            self.result['Highest'][1] = month
+                            self.result['Highest'][2] = day
+
+                        else:
+                            self.result['Highest'].append(self.max_temp)
+                            self.result['Highest'].append(month)
+                            self.result['Highest'].append(day)
+                            # print(f"in else, {self.result['Highest']}")
+
+                if v[1]:
+                    if self.min_temp > int(v[1]):
+                        # print(f"in if 2, readings: {v}")
+                        self.min_temp = int(v[1])
+                        if self.result['Lowest']:
+                            self.result['Lowest'][0] = self.min_temp
+                            self.result['Lowest'][1] = month
+                            self.result['Lowest'][2] = day
+                        else:
+                            self.result['Lowest'].append(self.min_temp)
+                            self.result['Lowest'].append(month)
+                            self.result['Lowest'].append(day)
+                if v[2]:
+                    if self.max_humidity < int(v[2]):
+                        # print(f"in if 3, {self.max_humidity}, readings: {v}")
+                        self.max_humidity = int(v[2])
+                        if self.result['Humidity']:
+                            self.result['Humidity'][0] = self.max_humidity
+                            self.result['Humidity'][1] = month
+                            self.result['Humidity'][2] = day
+                        else:
+                            self.result['Humidity'].append(self.max_humidity)
+                            self.result['Humidity'].append(month)
+                            self.result['Humidity'].append(day)
+
+        # print(f"Result: {self.result}")
+        for key, value in self.result.items():
+            print(f"{key}: {value[0]}C on {self.months[value[1]]} {value[2]}")
+
+
+
 
 
 if __name__ == '__main__':
