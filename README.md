@@ -1,4 +1,4 @@
-## Weather Man 
+# Weather Man 
 A CLI based program that returns the weather of Muree, Pakistan on a said day.
 
 ### The Problem
@@ -24,6 +24,9 @@ weather = {
 ```
 
 
-### Output of data structure after operation
-
-![img.png](output.png)
+## Screenshots
+### Given an year, return the days where the temperature was:
+#### - The highest
+#### - The lowest
+#### - The most humid
+![task_1_output](https://github.com/saadberry/weather-man-cli/assets/15974895/f25ef5cb-3692-438d-ba88-73b2f3b7466b)
