@@ -118,6 +118,7 @@ class ReadWeather():
                         # print('day after operation', day)
                     if day not in self.weather_data[year][month]:
                         self.weather_data[year][month][day] = []
+
                     if not self.weather_data[year][month][day]:
                         temp_list = self.convert_temp_reading_to_list(d)
                         # print(temp_list)
@@ -128,11 +129,9 @@ class ReadWeather():
                         self.weather_data[year][month][day].append(temp_list[3])
                         # Add max humidity
                         self.weather_data[year][month][day].append(temp_list[8])
-                        # For task 2
-                        # Add mean temp
-                        self.weather_data_2[year][month][day].append(temp_list[2])
+                        # TODO: For task 2
                         # Add mean humidity
-                        self.weather_data_2[year][month][day].append(temp_list[7])
+                        self.weather_data[year][month][day].append(temp_list[7])
         # print(self.weather_data)
 
 
@@ -144,7 +143,6 @@ class CalculateTemp(ReadWeather):
     def __init__(self, weather_instance):
         # weather readings will be stored as [max_temp, min_temp, max_humidity]
         self.weather_readings = weather_instance.weather_data
-        self.weather_readings_2 = weather_instance.weather_data_2
         self.exception_msg = "Please enter a valid integer value from 2004 - 2016"
         # print(self.weather_readings)
         # For task 1
@@ -159,9 +157,9 @@ class CalculateTemp(ReadWeather):
         # For task 2
         self.max_avg, self.avg_humidity, self.min_avg = 0, 0, 100
         self.result_two = {
-            'Highest Average': [], # temperature, month, day
-            'Lowest Average': [],
-            'Average Mean Humidity': []
+            'Highest Average': None,
+            'Lowest Average': None,
+            'Average Mean Humidity': None
         }
 
     def validate_data(self, year):
@@ -269,31 +267,35 @@ class CalculateTemp(ReadWeather):
             if key == user_input[1]:
                 print("MONTH")
                 # print(value)
+                max_temp_count, min_temp_count, mean_humidity_count = 0, 0, 0
+                max_temp_sum, min_temp_sum, mean_humidity_sum = 0, 0, 0
                 for k, v in value.items():
                     print(f"{k}: {v}")
                     day = int(k)
-                    # If mean temp value exists
+                    # If max_temp value exists
                     if v[0]:
-                        # Check for max and min in this block
-                        if self.max_avg < int(v[0]):
-                            # print("in if")
-                            self.max_avg = int(v[0])
-                            if self.result['Highest']:
-                                self.result['Highest'][0] = self.max_avg
-                                self.result['Highest'][1] = user_input[1]
-                                self.result['Highest'][2] = day
-
-                            else:
-                                self.result['Highest'].append(self.max_avg)
-                                self.result['Highest'].append(user_input[1])
-                                self.result['Highest'].append(day)
+                        max_temp_sum += int(v[0])
+                        max_temp_count += 1
+                    # If max_temp value exists
                     if v[1]:
-                        # check for max avg humidity here
-                        pass
-            # month = value.get(user_input[1])
+                        min_temp_sum += int(v[1])
+                        min_temp_count += 1
+                    # If mean_humidity value exists
+                    if v[3]:
+                        mean_humidity_sum += int(v[3])
+                        mean_humidity_count += 1
+                self.result_two['Highest Average'] = (max_temp_sum//max_temp_count)
+                self.result_two['Lowest Average'] = (min_temp_sum//min_temp_count)
+                self.result_two['Average Mean Humidity'] = (mean_humidity_sum//mean_humidity_count)
+        for k, v in self.result_two.items():
+            print(f"{k}: {v}C")
 
 
-
+    def task_three(self):
+        """
+        Method that, given a month, draws two horizontal bar charts on the console for the highest and lowest temperature on each day.
+        Highest in red and lowest in blue.
+        """
 
 if __name__ == '__main__':
     weather = ReadWeather()
