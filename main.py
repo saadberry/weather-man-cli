@@ -3,6 +3,8 @@ Main file to handle weather data
 """
 import os
 import calendar
+from colorama import Fore, Style
+
 """
 
 We can define data structure as: 
@@ -144,6 +146,7 @@ class CalculateTemp(ReadWeather):
         # weather readings will be stored as [max_temp, min_temp, max_humidity]
         self.weather_readings = weather_instance.weather_data
         self.exception_msg = "Please enter a valid integer value from 2004 - 2016"
+        self.year_month_exception_msg = "Invalid date format entered! Please enter a date of format: YYYY/MM"
         # print(self.weather_readings)
         # For task 1
         self.max_temp, self.max_humidity, self.min_temp = 0, 0, 100
@@ -161,8 +164,17 @@ class CalculateTemp(ReadWeather):
             'Lowest Average': None,
             'Average Mean Humidity': None
         }
-
-    def validate_data(self, year):
+        """
+        We will store result 3 as:
+            result_three = {
+                 '1': [max_temp_bar_chart, min_temp_bar_chart],
+                  .
+                  .
+                  .
+           }
+        """
+        self.result_three = {}
+    def validate_year(self, year):
         """
         Method that validates that:
            - The value entered is of type int
@@ -177,6 +189,30 @@ class CalculateTemp(ReadWeather):
             raise Exception(self.exception_msg)
         assert 2004 <= year <= 2016, self.exception_msg
 
+    def validate_year_and_month(self, date):
+        """
+        Method that validates year & month date entered.
+        Args:
+            date(str): "YYYY/MM", e.g. 2005/11
+        """
+        assert '/' in date, self.year_month_exception_msg
+
+    def generate_bar_chart(self, temp):
+        """
+        Method that generates a horizontal bar chart representing the temperature
+        Args:
+            temp(int): temperature reading, e.g. 5
+        Returns:
+            bar_chart(str): horizontal bar chart, e.g. +++++
+        """
+        bar_chart = ""
+        count = 0
+        while count < int(temp):
+            bar_chart += "+"
+            count += 1
+        return bar_chart
+
+
     def task_one(self):
         """
         Method that, given a year, computes the days of:
@@ -188,7 +224,7 @@ class CalculateTemp(ReadWeather):
         """
         # year = input("Enter year: [e.g. 2005")
         year = str(2005)
-        self.validate_data(year)
+        self.validate_year(year)
         # print(f"Year entered: {year}")
         year_data = self.weather_readings.get(year)
         # print(f"Year data: {year_data}")
@@ -254,10 +290,7 @@ class CalculateTemp(ReadWeather):
         """
         # month = input("Enter the month: [e.g. 2005/6]")
         month = "2005/11"
-        """
-        Add validation for user input, ensure:
-            - Format YYYY/MM
-        """
+        self.validate_year_and_month(month)
         user_input = month.split('/')
         print(user_input)
         year_data = self.weather_readings.get(user_input[0])
@@ -265,7 +298,6 @@ class CalculateTemp(ReadWeather):
         for key, value in year_data.items():
             # print(f"{key}: {value}")
             if key == user_input[1]:
-                print("MONTH")
                 # print(value)
                 max_temp_count, min_temp_count, mean_humidity_count = 0, 0, 0
                 max_temp_sum, min_temp_sum, mean_humidity_sum = 0, 0, 0
@@ -290,16 +322,48 @@ class CalculateTemp(ReadWeather):
         for k, v in self.result_two.items():
             print(f"{k}: {v}C")
 
-
     def task_three(self):
         """
         Method that, given a month, draws two horizontal bar charts on the console for the highest and lowest temperature on each day.
         Highest in red and lowest in blue.
         """
+        # month = input("Enter the month: [e.g. 2005/6]")
+        month = "2005/11"
+        self.validate_year_and_month(month)
+        user_input = month.split('/')
+        print(user_input)
+        year_data = self.weather_readings.get(user_input[0])
+        # print(year_data)
+        for key, value in year_data.items():
+            # print(f"{key}: {value}")
+            # If key is our desired month
+            if key == user_input[1]:
+                for k, v in value.items():
+                    # print(f"{k}: {v}")
+                    if not self.result_three.get(k):
+                        self.result_three[k] = []
+                    if v[0]:
+                        self.result_three[k].append(self.generate_bar_chart(v[0]))
+                    if v[1]:
+                        self.result_three[k].append(self.generate_bar_chart(v[1]))
+        print(Fore.RED + "This text is red", Style.RESET_ALL + "123")
+
+        # print(self.result_three)
+        for key, value in self.result_three.items():
+            # print(f"{key}: {value}")
+            if value:
+                print(Style.RESET_ALL)
+                if value[0]:
+                    print(f"{key}: {Fore.RED} {value[0]} {Style.RESET_ALL} {len(value[0])}C")
+                if value[1]:
+                    print(f"{key}: {Fore.CYAN} {value[1]} {Style.RESET_ALL} {len(value[1])}C")
+
+
 
 if __name__ == '__main__':
     weather = ReadWeather()
     weather.read_data()
     calc_temp = CalculateTemp(weather)
     # calc_temp.task_one()
-    calc_temp.task_two()
+    # calc_temp.task_two()
+    calc_temp.task_three()
