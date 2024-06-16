@@ -142,7 +142,8 @@ class CalculateTemp(ReadWeather):
     Class that calculates the highest, lowest temperature and max humidity
     """
 
-    def __init__(self, weather_instance):
+    def __init__(self, weather_instance, report):
+        self.report = report
         # weather readings will be stored as [max_temp, min_temp, max_humidity]
         self.weather_readings = weather_instance.weather_data
         self.exception_msg = "Please enter a valid integer value from 2004 - 2016"
@@ -156,7 +157,6 @@ class CalculateTemp(ReadWeather):
             'Lowest': [],
             'Humidity': []
         }
-        self.months = list(calendar.month_name)
         # For task 2
         self.max_avg, self.avg_humidity, self.min_avg = 0, 0, 100
         self.result_two = {
@@ -174,6 +174,7 @@ class CalculateTemp(ReadWeather):
            }
         """
         self.result_three = {}
+
     def validate_year(self, year):
         """
         Method that validates that:
@@ -213,7 +214,7 @@ class CalculateTemp(ReadWeather):
         return bar_chart
 
 
-    def task_one(self):
+    def task_one(self, year):
         """
         Method that, given a year, computes the days of:
             - Max temperature
@@ -221,9 +222,10 @@ class CalculateTemp(ReadWeather):
             - Max Humidity
         - First max, min temp & humidity values will be stored in self.weather_readings
         - Then, for subsequent iterations we will be doing a comparison. And update values accordingly
+
+       Arguments:
+           - year (str): year being queried. e.g. 2002
         """
-        # year = input("Enter year: [e.g. 2005")
-        year = str(2005)
         self.validate_year(year)
         # print(f"Year entered: {year}")
         year_data = self.weather_readings.get(year)
@@ -277,22 +279,25 @@ class CalculateTemp(ReadWeather):
                             self.result['Humidity'].append(month)
                             self.result['Humidity'].append(day)
 
-        # print(f"Result: {self.result}")
-        for key, value in self.result.items():
-            print(f"{key}: {value[0]}C on {self.months[value[1]]} {value[2]}")
+        if self.result:
+            return self.result
 
-    def task_two(self):
+        else:
+            return None
+    def task_two(self, date):
         """
         Method that, given a month, computes the days of:
             - Average highest temperature
             - Average lowest temperature
             - Average mean humidity
+
+        Arguments
+            - Date (str): Date being queried. e.g. 2005/6
         """
-        # month = input("Enter the month: [e.g. 2005/6]")
-        month = "2005/11"
-        self.validate_year_and_month(month)
-        user_input = month.split('/')
-        print(user_input)
+        # month = "2005/11"
+        self.validate_year_and_month(date)
+        user_input = date.split('/')
+        # print(user_input)
         year_data = self.weather_readings.get(user_input[0])
         # print(year_data)
         for key, value in year_data.items():
@@ -302,7 +307,7 @@ class CalculateTemp(ReadWeather):
                 max_temp_count, min_temp_count, mean_humidity_count = 0, 0, 0
                 max_temp_sum, min_temp_sum, mean_humidity_sum = 0, 0, 0
                 for k, v in value.items():
-                    print(f"{k}: {v}")
+                    # print(f"{k}: {v}")
                     day = int(k)
                     # If max_temp value exists
                     if v[0]:
@@ -319,51 +324,125 @@ class CalculateTemp(ReadWeather):
                 self.result_two['Highest Average'] = (max_temp_sum//max_temp_count)
                 self.result_two['Lowest Average'] = (min_temp_sum//min_temp_count)
                 self.result_two['Average Mean Humidity'] = (mean_humidity_sum//mean_humidity_count)
-        for k, v in self.result_two.items():
-            print(f"{k}: {v}C")
+        if self.result_two:
+            return self.result_two
+        else:
+            return None
 
-    def task_three(self):
+    def task_three(self, date):
         """
-        Method that, given a month, draws two horizontal bar charts on the console for the highest and lowest temperature on each day.
-        Highest in red and lowest in blue.
+        - Method that draws two horizontal bar charts on the console for the highest and lowest temperature on each day.
+        - The highest temperature will be in red and lowest in blue.
+
+        Arguments
+            - Date (str): Date being queried. e.g. 2005/6
         """
-        # month = input("Enter the month: [e.g. 2005/6]")
-        month = "2005/11"
-        self.validate_year_and_month(month)
-        user_input = month.split('/')
-        print(user_input)
+        self.validate_year_and_month(date)
+        user_input = date.split('/')
+        self.validate_year(user_input[0])
         year_data = self.weather_readings.get(user_input[0])
-        # print(year_data)
         for key, value in year_data.items():
-            # print(f"{key}: {value}")
             # If key is our desired month
             if key == user_input[1]:
                 for k, v in value.items():
-                    # print(f"{k}: {v}")
                     if not self.result_three.get(k):
                         self.result_three[k] = []
                     if v[0]:
                         self.result_three[k].append(self.generate_bar_chart(v[0]))
                     if v[1]:
                         self.result_three[k].append(self.generate_bar_chart(v[1]))
-        print(Fore.RED + "This text is red", Style.RESET_ALL + "123")
+        if self.result_three:
+            return self.result_three
+        else:
+            return None
 
-        # print(self.result_three)
-        for key, value in self.result_three.items():
-            # print(f"{key}: {value}")
-            if value:
-                print(Style.RESET_ALL)
-                if value[0]:
-                    print(f"{key}: {Fore.RED} {value[0]} {Style.RESET_ALL} {len(value[0])}C")
-                if value[1]:
-                    print(f"{key}: {Fore.CYAN} {value[1]} {Style.RESET_ALL} {len(value[1])}C")
+    def read_input(self):
+        """
+        Method that reads input from user.
+        According to user, calls appropriate method.
+        Cases:
+            1 - If '-e' is mentioned, call method 1
+            2 - If '-a' is mentioned, call method 2
+            3 - If '-c' is mentioned, call method 3
 
+        User can also request for multiple reports in a single prompt, e.g. "-c 2011/03 -a 2011/3 -e 2011"
+        """
+        prompt = input("Please enter prompt: ")
+        # Split prompt into a list
+        refined_prompt = prompt.split(' ')
+        # print(f"prompt: {prompt}")
+        # TODO: create a class for creating reports, and look into how you will store/keep track of different reports
+        report = GenerateReports()
+        for i in range(len(refined_prompt)):
+            # Call method 1
+            if refined_prompt[i] == '-e':
+                self.report.generate_report(1, self.task_one(refined_prompt[i+1]))
+            elif refined_prompt[i] == '-a':
+                self.report.generate_report(2, self.task_two(refined_prompt[i+1]))
+            elif refined_prompt[i] == '-c':
+                # print(refined_prompt[i+1])
+                self.report.generate_report(3, self.task_three(refined_prompt[i+1]))
+
+class GenerateReports():
+    """
+    Class that generates reports from temperature data.
+    """
+    def __init__(self):
+        self.report = {}
+        self.months = list(calendar.month_name)
+
+    def generate_report(self, task_number, result):
+        """
+        Method that generates reports from temperature data according to the task number.
+        Args:
+            task_number (int): Task number. e.g. task 1
+            result (str): Result of the query. e.g.
+                "Highest Average: 15C
+                 Lowest Average: 8C
+                 Average Mean Humidity: 62C"
+        """
+        self.report[task_number] = result
+
+    def display_report(self):
+        """
+        Method that displays reports.
+        Returns:
+            self.report (dict): The generated report.
+        """
+        error_msg = 'No data found for task {key} (flag: {flag}), please try another range.'
+        if self.report:
+            for key, value in self.report.items():
+                print("", end="\n\n")
+                if key == 3:
+                    print(Style.RESET_ALL)
+                    if value:
+                        for key, v in value.items():
+                            if v:
+                                if v[0]:
+                                    print(f"{key}: {Fore.RED} {v[0]} {Style.RESET_ALL} {len(v[0])}C")
+                                if v[1]:
+                                    print(f"{key}: {Fore.CYAN} {v[1]} {Style.RESET_ALL} {len(v[1])}C")
+                    else:
+                        print(error_msg.format(key=key, flag="-c"), end="\n\n")
+                elif key == 2:
+                    if value:
+                        for k, v in value.items():
+                            print(f'{k}: {v} C')
+                    else:
+                        print(error_msg.format(key=key, flag="-a"), end="\n\n")
+                elif key == 1:
+                    if value:
+                        for key, value in value.items():
+                            print(f"{key}: {value[0]}C on {self.months[value[1]]} {value[2]}")
+                    else:
+                        print(error_msg.format(key=key, flag="-e"), end="\n\n")
 
 
 if __name__ == '__main__':
     weather = ReadWeather()
     weather.read_data()
-    calc_temp = CalculateTemp(weather)
-    # calc_temp.task_one()
-    # calc_temp.task_two()
-    calc_temp.task_three()
+    report = GenerateReports()
+    calc_temp = CalculateTemp(weather, report)
+
+    calc_temp.read_input()
+    report.display_report()
