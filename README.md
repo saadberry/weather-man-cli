@@ -29,4 +29,15 @@ weather = {
 #### - The highest
 #### - The lowest
 #### - The most humid
-![task_1_output](https://github.com/saadberry/weather-man-cli/assets/15974895/f25ef5cb-3692-438d-ba88-73b2f3b7466b)
+![img_1.png](screenshots/task_one.png)
+
+### Given a date, return the **_**average**_** temperature was:
+#### - The highest
+#### - The lowest
+#### - The most humid
+![img.png](screenshots/task_two.png)
+
+### Given a date, draw two horizontal bar charts for days with:
+#### - The highest temperature ( In red )
+#### - The lowest temperature ( In blue)
+![img.png](screenshots/task_three.png)
