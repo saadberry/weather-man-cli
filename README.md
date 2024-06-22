@@ -1,6 +1,18 @@
 # Weather Man 
 A CLI based program that returns the weather of a said day.
 
+## Setup
+
+1. Clone this directory.
+2. Create a virtual environment.
+    - On Linux, you can do this by running the following commands:
+        - `virtualenv venv`
+        - `source venve/bin/activate`
+3. Install the packages in `requirements.txt`:
+    - `pip install -r requirements.txt` (Use 'pip3' instead of 'pip' if you are on Python3)
+4. Run the program:
+    - `python -m main` (Use 'python3' instead of 'python' if you are on Python3)
+
 ### The Problem
 
 Given a dataset of weather readings of Muree, Pakistan:
