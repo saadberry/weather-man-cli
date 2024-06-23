@@ -1,8 +1,12 @@
 """
 Main file to handle weather data
 """
+import json
 import os
 import calendar
+import time
+import sys
+
 from colorama import Fore, Style
 
 """
@@ -84,57 +88,75 @@ class ReadWeather():
         Returns:
             weather_data (dict): weather data
         """
-        files_directory = "/home/winston/documents/code/training-plan/weather-man-cli/weatherfiles/"
-        files = os.listdir(files_directory)
-        # print(self.weather_data)
-        for f in files:
-            with open(f"{files_directory}/{f}", 'r') as reader:
-                x = reader.readlines()
-                data = x[1:]
-                # Extract the year & month
-                year = str(x[1])[:4]
-                # print(x[1])
-                month = str(x[1])[5:8]
-                if month[-1] == '-':
-                    month = month[:-1]
-                if month[-2] == '-':
-                    month = month[:-2]
-                # print('month', month)
-                if year not in self.weather_data:
-                    self.weather_data[year] = {}
-                if month not in self.weather_data[year]:
-                    self.weather_data[year][month] = {}
-                for d in data:
-                    # print(d)
-                    # print('month', month)
-                    if int(month) <= 9:
-                        day = str(d)[7:9]
-                    else:
-                        # print('yes')
-                        day = str(d)[8:10]
-                        # print(day)
-                    # print(day)
-                    # For single-digit days, remove trailing comma
-                    if day[-1] == ',':
-                        day = day[:-1]
-                        # print('day after operation', day)
-                    if day not in self.weather_data[year][month]:
-                        self.weather_data[year][month][day] = []
+        # files_directory = "/home/winston/documents/code/training-plan/weather-man-cli/weatherfiles/"
+        # files = os.listdir(files_directory)
+        # # print(self.weather_data)
+        # for f in files:
+        #     with open(f"{files_directory}/{f}", 'r') as reader:
+        #         x = reader.readlines()
+        #         data = x[1:]
+        #         # Extract the year & month
+        #         year = str(x[1])[:4]
+        #         # print(x[1])
+        #         month = str(x[1])[5:8]
+        #         if month[-1] == '-':
+        #             month = month[:-1]
+        #         if month[-2] == '-':
+        #             month = month[:-2]
+        #         # print('month', month)
+        #         if year not in self.weather_data:
+        #             self.weather_data[year] = {}
+        #         if month not in self.weather_data[year]:
+        #             self.weather_data[year][month] = {}
+        #         for d in data:
+        #             # print(d)
+        #             # print('month', month)
+        #             if int(month) <= 9:
+        #                 day = str(d)[7:9]
+        #             else:
+        #                 # print('yes')
+        #                 day = str(d)[8:10]
+        #                 # print(day)
+        #             # print(day)
+        #             # For single-digit days, remove trailing comma
+        #             if day[-1] == ',':
+        #                 day = day[:-1]
+        #                 # print('day after operation', day)
+        #             if day not in self.weather_data[year][month]:
+        #                 self.weather_data[year][month][day] = []
+        #
+        #             if not self.weather_data[year][month][day]:
+        #                 temp_list = self.convert_temp_reading_to_list(d)
+        #                 # print(temp_list)
+        #                 # For task 1
+        #                 # Add max temp
+        #                 self.weather_data[year][month][day].append(temp_list[1])
+        #                 # Add min temp
+        #                 self.weather_data[year][month][day].append(temp_list[3])
+        #                 # Add max humidity
+        #                 self.weather_data[year][month][day].append(temp_list[8])
+        #                 # TODO: For task 2
+        #                 # Add mean humidity
+        #                 self.weather_data[year][month][day].append(temp_list[7])
 
-                    if not self.weather_data[year][month][day]:
-                        temp_list = self.convert_temp_reading_to_list(d)
-                        # print(temp_list)
-                        # For task 1
-                        # Add max temp
-                        self.weather_data[year][month][day].append(temp_list[1])
-                        # Add min temp
-                        self.weather_data[year][month][day].append(temp_list[3])
-                        # Add max humidity
-                        self.weather_data[year][month][day].append(temp_list[8])
-                        # TODO: For task 2
-                        # Add mean humidity
-                        self.weather_data[year][month][day].append(temp_list[7])
+        ## Code to write weather data to a file
+        # if not os.path.exists(file_path):
+        #     # Create and write data to the new file
+        #     data_str = json.dumps(self.weather_data, indent=4)
+        #     with open(file_path, 'w') as file:
+        #         file.write(data_str)
+        #     print(f"File weather-data.txt created and data written to it.")
+        current_directory = os.getcwd()
+        file_path = f"{current_directory}/weather-data.txt"
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                data_str = file.read()
+                self.weather_data = json.loads(data_str)
+        else:
+            print(f"File '{file_path}' does not exist.")
+            return None
         # print(self.weather_data)
+
 
 
 class CalculateTemp(ReadWeather):
@@ -174,6 +196,19 @@ class CalculateTemp(ReadWeather):
            }
         """
         self.result_three = {}
+        self.welcome_msg = [
+            "Greetings! I'm the Weather Man :)",
+            "Let's walk you through the different ways you can inquire about the weather",
+            "First things first, my knowledge is from the years 2006 - 2012",
+            "If you want to learn about:",
+            "1. The days where the temperature was the highest, lowest and the most humid - Write: '-e <year>'.",
+            "e.g. -e 2006",
+            "2. The days where the average temperature was the highest, lowest & most humid - Write: '-a <year/month>",
+            "e.g. -a 2006/10",
+            "3. To see bar charts for the highest and lowest temperatures - Write: '-c <year/month>",
+            "e.g. -a 2006/10",
+            "Enter a prompt: "
+        ]
 
     def validate_year(self, year):
         """
@@ -367,7 +402,20 @@ class CalculateTemp(ReadWeather):
 
         User can also request for multiple reports in a single prompt, e.g. "-c 2011/03 -a 2011/3 -e 2011"
         """
-        prompt = input("Please enter prompt: ")
+        # TODO: make this a seperate funciton
+        def typing_animation(text, delay=0.05):
+            for char in text:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+                time.sleep(delay)
+            print()  # for new line after the message is printed
+
+        for i, msg in enumerate(self.welcome_msg):
+            if i == len(self.welcome_msg) - 1:
+                prompt = input(f"{msg} ")
+            typing_animation(msg)
+            time.sleep(0.5)
+
         # Split prompt into a list
         refined_prompt = prompt.split(' ')
         # print(f"prompt: {prompt}")
@@ -380,8 +428,9 @@ class CalculateTemp(ReadWeather):
             elif refined_prompt[i] == '-a':
                 self.report.generate_report(2, self.task_two(refined_prompt[i+1]))
             elif refined_prompt[i] == '-c':
-                # print(refined_prompt[i+1])
                 self.report.generate_report(3, self.task_three(refined_prompt[i+1]))
+            else:
+                print("Invalid input. Please try again.")
 
 class GenerateReports():
     """
